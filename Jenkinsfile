@@ -187,23 +187,6 @@ pipeline {
     always {
       script {
         if (currentBuild.resultIsWorseOrEqualTo('FAILURE')) {
-          currentBuild.result =
-              'UNSTABLE' echo '⚠️ Some stages failed — marking build as UNSTABLE.'
-        }
-      }
-    }
-    unstable{
-        echo '⚠️ Build completed with failed stages — check test reports for details.'} unstable{
-        echo '⚠️ Some tests failed — marking build as UNSTABLE (not failed).'} failure{
-        echo '❌ Pipeline failed completely — check logs and reports.'} success {
-      echo '✅ All stages passed successfully!'
-    }
-  }
-  
-  post {
-    always {
-      script {
-        if (currentBuild.resultIsWorseOrEqualTo('FAILURE')) {
           currentBuild.result = 'UNSTABLE'
           echo '⚠️ Some stages failed — marking build as UNSTABLE.'
         }
