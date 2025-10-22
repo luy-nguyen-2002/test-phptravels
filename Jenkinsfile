@@ -1,4 +1,7 @@
+// ======================================================
 // ---------- SHARED FUNCTIONS ----------
+// ======================================================
+
 def runPlaywright(tags, project) {
   catchError(buildResult : 'SUCCESS', stageResult : 'FAILURE') {
     bat """
@@ -16,6 +19,11 @@ def runPlaywrightInvert(tags, project) {
     """
   }
 }
+
+// ======================================================
+// ---------- PIPELINE ----------
+// ======================================================
+
 pipeline {
   agent any
 
@@ -68,16 +76,20 @@ pipeline {
         script {
           catchError(buildResult : 'SUCCESS', stageResult : 'FAILURE') {
             if (fileExists('.env.example')) {
-              echo 'Loading environment variables from .env.example' def
-                  envLines = readFile('.env.example').split('\n') def envList =
-                      [] for (line in envLines) {
+              echo 'Loading environment variables from .env.example'
+              def envLines = readFile('.env.example').split('\n')
+              def envList = []
+
+              for (line in envLines) {
                 if (!line.trim().startsWith('#') && line.contains('=')) {
-                  def(key, value) =
-                      line.split('=', 2) envList
-                      << "${key.trim()}=${value.trim().replaceAll('" ', '')}"
+                  def (key, value) = line.split('=', 2)
+                  envList << "${key.trim()}=${value.trim().replaceAll('\"', '')}"
                 }
               }
-              withEnv(envList) { echo '✅ Environment variables loaded.' }
+
+              withEnv(envList) {
+                echo '✅ Environment variables loaded.'
+              }
             } else {
               echo '⚠️ No .env.example found. Proceeding with defaults.'
             }
@@ -98,64 +110,69 @@ pipeline {
     stage('Priority Tests') {
       parallel {
         stage('Chrome') {
-          steps { runPlaywright('@smoke|@positive', 'Google Chrome') }
+          steps {
+            script { runPlaywright('@smoke|@positive', 'Google Chrome') }
+          }
         }
         stage('Edge') {
-          steps { runPlaywright('@smoke|@positive', 'Microsoft Edge') }
+          steps {
+            script { runPlaywright('@smoke|@positive', 'Microsoft Edge') }
+          }
         }
         stage('Safari') {
-          steps { runPlaywright('@smoke|@positive', 'Apple Safari') }
+          steps {
+            script { runPlaywright('@smoke|@positive', 'Apple Safari') }
+          }
         }
         stage('Firefox') {
-          steps { runPlaywright('@smoke|@positive', 'Mozilla Firefox') }
+          steps {
+            script { runPlaywright('@smoke|@positive', 'Mozilla Firefox') }
+          }
         }
         stage('Samsung Internet') {
           steps {
-            runPlaywright('@smoke|@positive', 'Samsung Internet (Android)')
+            script { runPlaywright('@smoke|@positive', 'Samsung Internet (Android)') }
           }
         }
         stage('Opera / Brave') {
           steps {
-            runPlaywright('@smoke|@positive', 'Opera / Brave (Chromium)')
+            script { runPlaywright('@smoke|@positive', 'Opera / Brave (Chromium)') }
           }
         }
       }
+    }
 
-      // ---------- REMAINING TESTS ----------
-      stage('Remaining Tests') {
-        parallel {
-          stage('Chrome') {
-            steps { runPlaywrightInvert('@smoke|@positive', 'Google Chrome') }
-          }
-          stage('Edge') {
-            steps { runPlaywrightInvert('@smoke|@positive', 'Microsoft Edge') }
-          }
-          stage('Safari') {
-            steps { runPlaywrightInvert('@smoke|@positive', 'Apple Safari') }
-          }
-          stage('Firefox') {
-            steps { runPlaywrightInvert('@smoke|@positive', 'Mozilla Firefox') }
-          }
-          stage('Samsung Internet') {
-            steps {
-              runPlaywrightInvert('@smoke|@positive',
-                                  'Samsung Internet (Android)')
-            }
-          }
-          stage('Opera / Brave') {
-            steps {
-              runPlaywrightInvert('@smoke|@positive',
-                                  'Opera / Brave (Chromium)')
-            }
+    // ---------- REMAINING TESTS ----------
+    stage('Remaining Tests') {
+      parallel {
+        stage('Chrome') {
+          steps {
+            script { runPlaywrightInvert('@smoke|@positive', 'Google Chrome') }
           }
         }
-      }
-
-      // ---------- REPORTING ----------
-      stage('Generate Allure Report') {
-        steps {
-          catchError(buildResult : 'SUCCESS', stageResult : 'FAILURE') {
-            bat 'npx allure generate ./allure-results --clean -o allure-report'
+        stage('Edge') {
+          steps {
+            script { runPlaywrightInvert('@smoke|@positive', 'Microsoft Edge') }
+          }
+        }
+        stage('Safari') {
+          steps {
+            script { runPlaywrightInvert('@smoke|@positive', 'Apple Safari') }
+          }
+        }
+        stage('Firefox') {
+          steps {
+            script { runPlaywrightInvert('@smoke|@positive', 'Mozilla Firefox') }
+          }
+        }
+        stage('Samsung Internet') {
+          steps {
+            script { runPlaywrightInvert('@smoke|@positive', 'Samsung Internet (Android)') }
+          }
+        }
+        stage('Opera / Brave') {
+          steps {
+            script { runPlaywrightInvert('@smoke|@positive', 'Opera / Brave (Chromium)') }
           }
         }
       }
@@ -177,6 +194,33 @@ pipeline {
           echo '❌ Pipeline failed completely — check logs and reports.'} success {
         echo '✅ All stages passed successfully!'
       }
+    }
+  }
+
+  post {
+    always {
+      script {
+        if (currentBuild.resultIsWorseOrEqualTo('FAILURE')) {
+          currentBuild.result = 'UNSTABLE'
+          echo '⚠️ Some stages failed — marking build as UNSTABLE.'
+        }
+      }
+
+      archiveArtifacts artifacts: 'allure-report/**', allowEmptyArchive: true
+      archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
+      archiveArtifacts artifacts: 'test-results/**, traces/**, videos/**', allowEmptyArchive: true
+    }
+
+    unstable {
+      echo '⚠️ Build completed with failed stages — check test reports for details.'
+    }
+
+    failure {
+      echo '❌ Pipeline failed completely — check logs and reports.'
+    }
+
+    success {
+      echo '✅ All stages passed successfully!'
     }
   }
 }
