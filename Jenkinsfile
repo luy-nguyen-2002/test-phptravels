@@ -42,7 +42,7 @@ pipeline {
     stage('Checkout') {
       steps {
         script {
-          catchError(buildResult : 'SUCCESS', stageResult : 'FAILURE') {
+          catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
             git branch : 'main',
             url: 'https://github.com/luy-nguyen-2002/test-phptravels.git'
           }
@@ -53,7 +53,7 @@ pipeline {
     stage('Setup Node.js') {
       steps {
         script {
-          catchError(buildResult : 'SUCCESS', stageResult : 'FAILURE') {
+          catchError(buildResult : 'UNSTABLE', stageResult : 'FAILURE') {
             bat 'node -v || echo Node not installed' bat 'npm -v || echo npm not installed'
           }
         }
@@ -62,7 +62,7 @@ pipeline {
 
     stage('Install Dependencies') {
       steps {
-        catchError(buildResult : 'SUCCESS', stageResult : 'FAILURE') {
+        catchError(buildResult : 'UNSTABLE', stageResult : 'FAILURE') {
           bat 'npm ci'
         }
       }
@@ -70,7 +70,7 @@ pipeline {
 
     stage('Install Playwright Browsers') {
       steps {
-        catchError(buildResult : 'SUCCESS', stageResult : 'FAILURE') {
+        catchError(buildResult : 'UNSTABLE', stageResult : 'FAILURE') {
           bat 'npx playwright install --with-deps'
         }
       }
@@ -105,7 +105,7 @@ pipeline {
 
     stage('Generate BDD Tests (bddgen)') {
       steps {
-        catchError(buildResult : 'SUCCESS', stageResult : 'FAILURE') {
+        catchError(buildResult : 'UNSTABLE', stageResult : 'FAILURE') {
           bat 'npx bddgen'
         }
       }
@@ -116,7 +116,7 @@ pipeline {
       parallel {
         stage('Chrome') {
           steps {
-            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
               bat '''
                 echo Running Playwright tests for Google Chrome
                 npx playwright test --project="Google Chrome" --grep "@smoke|@positive" --reporter=list,html,allure-playwright
@@ -127,7 +127,7 @@ pipeline {
 
         stage('Edge') {
           steps {
-            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
               bat '''
                 echo Running Playwright tests for Microsoft Edge
                 npx playwright test --project="Microsoft Edge" --grep "@smoke|@positive" --reporter=list,html,allure-playwright
@@ -138,7 +138,7 @@ pipeline {
 
         stage('Safari') {
           steps {
-            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
               bat '''
                 echo Running Playwright tests for Apple Safari
                 npx playwright test --project="Apple Safari" --grep "@smoke|@positive" --reporter=list,html,allure-playwright
@@ -149,7 +149,7 @@ pipeline {
 
         stage('Firefox') {
           steps {
-            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
               bat '''
                 echo Running Playwright tests for Mozilla Firefox
                 npx playwright test --project="Mozilla Firefox" --grep "@smoke|@positive" --reporter=list,html,allure-playwright
@@ -160,7 +160,7 @@ pipeline {
 
         stage('Samsung Internet') {
           steps {
-            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
               bat '''
                 echo Running Playwright tests for Samsung Internet (Android)
                 npx playwright test --project="Samsung Internet (Android)" --grep "@smoke|@positive" --reporter=list,html,allure-playwright
@@ -171,7 +171,7 @@ pipeline {
 
         stage('Opera / Brave') {
           steps {
-            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
               bat '''
                 echo Running Playwright tests for Opera / Brave (Chromium)
                 npx playwright test --project="Opera / Brave (Chromium)" --grep "@smoke|@positive" --reporter=list,html,allure-playwright
@@ -187,7 +187,7 @@ pipeline {
       parallel {
         stage('Chrome') {
           steps {
-            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
               bat '''
                 echo Running remaining Playwright tests for Google Chrome
                 npx playwright test --project="Google Chrome" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright
@@ -198,7 +198,7 @@ pipeline {
 
         stage('Edge') {
           steps {
-            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
               bat '''
                 echo Running remaining Playwright tests for Microsoft Edge
                 npx playwright test --project="Microsoft Edge" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright
@@ -209,7 +209,7 @@ pipeline {
 
         stage('Safari') {
           steps {
-            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
               bat '''
                 echo Running remaining Playwright tests for Apple Safari
                 npx playwright test --project="Apple Safari" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright
@@ -220,7 +220,7 @@ pipeline {
 
         stage('Firefox') {
           steps {
-            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
               bat '''
                 echo Running remaining Playwright tests for Mozilla Firefox
                 npx playwright test --project="Mozilla Firefox" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright
@@ -231,7 +231,7 @@ pipeline {
 
         stage('Samsung Internet') {
           steps {
-            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
               bat '''
                 echo Running remaining Playwright tests for Samsung Internet (Android)
                 npx playwright test --project="Samsung Internet (Android)" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright
@@ -242,7 +242,7 @@ pipeline {
 
         stage('Opera / Brave') {
           steps {
-            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
               bat '''
                 echo Running remaining Playwright tests for Opera / Brave (Chromium)
                 npx playwright test --project="Opera / Brave (Chromium)" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright
