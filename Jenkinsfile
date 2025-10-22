@@ -43,21 +43,26 @@ pipeline {
         script {
           if (fileExists('.env.example')) {
             echo 'Loading environment variables from .env.example'
-            def envFile = readFile('.env.example').split('\n')
-            envFile.each { line ->
-              if (line.trim() && !line.startsWith('#')) {
-                def parts = line.trim().split('=')
-                if (parts.length == 2) {
-                  env[parts[0].trim()] = parts[1].trim()
-                }
+            def lines = readFile('.env.example').split('\n')
+            def envList = []
+            for (line in lines) {
+              if (!line.trim().startsWith('#') && line.contains('=')) {
+                def parts = line.split('=')
+                def key = parts[0].trim()
+                def value = parts.length > 1 ? parts[1].trim().replaceAll('"', '') : ''
+                envList << "${key}=${value}"
               }
             }
+            withEnv(envList) {
+              echo "Environment variables loaded"
+            }
           } else {
-            echo '⚠️ No .env.example file found'
+            echo 'No .env.example file found'
           }
         }
       }
     }
+
 
     stage('Generate BDD Tests (bddgen)') {
       steps {
