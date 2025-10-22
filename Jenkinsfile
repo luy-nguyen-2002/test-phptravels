@@ -217,11 +217,11 @@ pipeline {
     unstable {
       echo '⚠️ Build completed with failed stages — check test reports for details.'
     }
-
-    failure {
+    
+    failure{
       echo '❌ Pipeline failed completely — check logs and reports.'
     }
-
+    
     success {
       echo '✅ All stages passed successfully!'
     }
