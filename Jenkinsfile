@@ -179,7 +179,7 @@ pipeline {
             script {
                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                     echo "📄 Generating Allure HTML Report"
-                    bat 'npx allure generate ./allure-results --clean -o allure-report'
+                    bat 'call npx allure generate "./allure-results" --clean -o "./allure-report"'
                 }
             }
         }

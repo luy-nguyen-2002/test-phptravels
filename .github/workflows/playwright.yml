@@ -63,15 +63,18 @@ jobs:
         run: |
           if [ -f .env.example ]; then
             echo "Loading from .env.example"
+            # Remove CR characters, filter comments, then output each key=value to $GITHUB_ENV
             sed 's/\r$//' .env.example | grep -v '^#' | while IFS='=' read -r key value; do
+              # optionally trim quotes/spaces
               echo "${key}=${value}" >> $GITHUB_ENV
             done
           else
-            echo "No .env.example found"
+            echo "No .env.example file found"
           fi
 
       - name: Debug environment
-        run: echo "BASE_URL is: $BASE_URL"
+        run: |
+          echo "BASE_URL is: $BASE_URL"
 
       - name: Generate BDD Tests (bddgen)
         run: npx bddgen
