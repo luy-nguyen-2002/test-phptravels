@@ -1,0 +1,193 @@
+name: Playwright tests (CI)
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: lts/*
+          cache: "npm" # optional built-in cache from setup-node
+
+      - name: Cache Playwright browsers
+        id: cache-browsers
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers (only what we need)
+        run: npx playwright install --with-deps
+
+      - name: Load .env into environment
+        run: |
+          if [ -f .env ]; then
+            echo "Loading from .env"
+            # Remove CR characters, filter comments, then output each key=value to $GITHUB_ENV
+            sed 's/\r$//' .env | grep -v '^#' | while IFS='=' read -r key value; do
+              # optionally trim quotes/spaces
+              echo "${key}=${value}" >> $GITHUB_ENV
+            done
+          else
+            echo "No .env file found"
+          fi
+
+      - name: Debug environment
+        run: |
+          echo "BASE_URL is: $BASE_URL"
+
+      # - name: Run Playwright BDD tests
+      #   env:
+      #     CI: "true"
+      #     HEADLESS: "true"
+          # BASE_URL: ${{ secrets.BASE_URL }}
+        # run: |
+        #   # optionally limit workers or run a shard
+        #   # npx playwright test --reporter=list
+        #   npx bddgen && npx playwright test --reporter=list,allure-playwright
+
+        # Generate tests from features once (bddgen)
+      - name: Generate BDD tests (bddgen)
+        run: npx bddgen
+
+      # ---------- Priority tests: run on browsers in order ----------
+      - name: Priority tests — Google Chrome (@smoke|@positive)
+        env:
+          CI: "true"
+          HEADLESS: "true"
+        run: |
+          npx playwright test --project="Google Chrome" --grep "@smoke|@positive" --reporter=list,html,allure-playwright
+
+      - name: Priority tests — Microsoft Edge (@smoke|@positive)
+        env:
+          CI: "true"
+          HEADLESS: "true"
+        run: |
+          npx playwright test --project="Microsoft Edge" --grep "@smoke|@positive" --reporter=list,html,allure-playwright
+
+      - name: Priority tests — Apple Safari (@smoke|@positive)
+        env:
+          CI: "true"
+          HEADLESS: "true"
+        run: |
+          npx playwright test --project="Apple Safari" --grep "@smoke|@positive" --reporter=list,html,allure-playwright
+
+      - name: Priority tests — Mozilla Firefox (@smoke|@positive)
+        env:
+          CI: "true"
+          HEADLESS: "true"
+        run: |
+          npx playwright test --project="Mozilla Firefox" --grep "@smoke|@positive" --reporter=list,html,allure-playwright
+
+      - name: Priority tests — Samsung Internet (Android) (@smoke|@positive)
+        env:
+          CI: "true"
+          HEADLESS: "true"
+        run: |
+          npx playwright test --project="Samsung Internet (Android)" --grep "@smoke|@positive" --reporter=list,html,allure-playwright
+
+      - name: Priority tests — Opera / Brave (Chromium) (@smoke|@positive)
+        env:
+          CI: "true"
+          HEADLESS: "true"
+        run: |
+          npx playwright test --project="Opera / Brave (Chromium)" --grep "@smoke|@positive" --reporter=list,html,allure-playwright
+
+      # ---------- Remaining tests: run on browsers in same order ----------
+      - name: Remaining tests — Google Chrome (everything else)
+        if: always()
+        env:
+          CI: "true"
+          HEADLESS: "true"
+        run: |
+          npx playwright test --project="Google Chrome" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright
+
+      - name: Remaining tests — Microsoft Edge (everything else)
+        if: always()
+        env:
+          CI: "true"
+          HEADLESS: "true"
+        run: |
+          npx playwright test --project="Microsoft Edge" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright
+
+      - name: Remaining tests — Apple Safari (everything else)
+        if: always()
+        env:
+          CI: "true"
+          HEADLESS: "true"
+        run: |
+          npx playwright test --project="Apple Safari" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright
+
+      - name: Remaining tests — Mozilla Firefox (everything else)
+        if: always()
+        env:
+          CI: "true"
+          HEADLESS: "true"
+        run: |
+          npx playwright test --project="Mozilla Firefox" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright
+
+      - name: Remaining tests — Samsung Internet (Android) (everything else)
+        if: always()
+        env:
+          CI: "true"
+          HEADLESS: "true"
+        run: |
+          npx playwright test --project="Samsung Internet (Android)" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright
+
+      - name: Remaining tests — Opera / Brave (Chromium) (everything else)
+        if: always()
+        env:
+          CI: "true"
+          HEADLESS: "true"
+        run: |
+          npx playwright test --project="Opera / Brave (Chromium)" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright
+      
+      # ---------------------------------------------------------------
+      - name: Generate Allure HTML report
+              # Run this even if tests fail so you can inspect results
+        if: always()
+        run: |
+          npx allure generate ./allure-results --clean -o allure-report
+
+      - name: Upload Allure report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report/
+          retention-days: 30
+
+      - name: Upload Playwright report (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload traces/videos/screenshots (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: |
+            test-results/
+            # traces/
+            # videos/
+          retention-days: 30

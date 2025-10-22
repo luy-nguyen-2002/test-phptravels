@@ -1,0 +1,53 @@
+# =========================
+# Node & Dependencies
+# =========================
+node_modules/
+package-lock.json
+
+# =========================
+# Playwright Artifacts
+# =========================
+test-results/
+playwright-report/
+allure-results/
+allure-report/
+blob-report/
+.traces/
+.screenshots/
+.videos/
+
+# =========================
+# Build & Temp Files
+# =========================
+dist/
+out/
+temp/
+tmp/
+*.log
+
+# =========================
+# Environment / Config
+# =========================
+.env
+.env.local
+.env.*.local
+
+# =========================
+# IDE / OS Files
+# =========================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# =========================
+# Generated Test Files
+# =========================
+.features-gen/
+
+# =========================
+# CI/CD
+# =========================
+# (You may want to keep .github/ and Jenkinsfile)
+# but ignore CI caches or logs if generated
+.github/workflows/*.log
