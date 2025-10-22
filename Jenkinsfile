@@ -179,7 +179,9 @@ pipeline {
             script {
                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                   echo "📄 Generating Allure HTML Report"
-                  bat 'call npx allure generate "C:\\Users\\Nguyen A Luy\\.jenkins\\workspace\\ts-phptravels-multibranch_main\\allure-results" --clean -o "C:\\Users\\Nguyen A Luy\\.jenkins\\workspace\\ts-phptravels-multibranch_main\\allure-report"'
+                  bat 'subst X: "C:\\Users\\Nguyen A Luy\\.jenkins\\workspace"'
+                  bat 'call npx allure generate "X:\\ts-phptravels-multibranch_main\\allure-results" --clean -o "X:\\ts-phptravels-multibranch_main\\allure-report"'
+                  bat 'subst X: /d'
                 }
             }
         }
