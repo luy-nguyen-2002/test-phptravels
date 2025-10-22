@@ -38,12 +38,12 @@ pipeline {
       }
     }
 
-    stage('Load Environment (.env)') {
+    stage('Load Environment (.env.example)') {
       steps {
         script {
-          if (fileExists('.env')) {
-            echo 'Loading environment variables from .env'
-            def envFile = readFile('.env').split('\n')
+          if (fileExists('.env.example')) {
+            echo 'Loading environment variables from .env.example'
+            def envFile = readFile('.env.example').split('\n')
             envFile.each { line ->
               if (line.trim() && !line.startsWith('#')) {
                 def parts = line.trim().split('=')
@@ -53,7 +53,7 @@ pipeline {
               }
             }
           } else {
-            echo '⚠️ No .env file found'
+            echo '⚠️ No .env.example file found'
           }
         }
       }
