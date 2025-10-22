@@ -172,6 +172,18 @@ pipeline {
         }
       }
     }
+
+    //allure report
+    stage('Generate Allure HTML Report') {
+        steps {
+            script {
+                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                    echo "📄 Generating Allure HTML Report"
+                    bat 'npx allure generate ./allure-results --clean -o allure-report'
+                }
+            }
+        }
+    }
   }
 
   post {
