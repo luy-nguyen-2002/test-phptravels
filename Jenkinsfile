@@ -28,7 +28,7 @@ pipeline {
   agent any
 
   environment {
-    BASE_URL=https://phptravels.net/
+    BASE_URL= "https://phptravels.net/"
     CI = "true"
     HEADLESS = "true"
   }
