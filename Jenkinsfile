@@ -48,7 +48,7 @@ pipeline {
       steps {
         script {
           catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            bat 'npx playwright install --with-deps'
+            bat 'npx playwright install --with-deps || echo Skipped (Windows)'
           }
         }
       }
@@ -59,7 +59,10 @@ pipeline {
         script {
           catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
             if (fileExists('.env.example')) {
-              echo 'Loading environment variables from .env.example'
+              echo '✅ Found .env.example — loading variables'
+              // Copy to actual .env for dotenv compatibility
+              bat 'copy .env.example .env'
+
               def lines = readFile('.env.example').split('\n')
               def envList = []
               for (line in lines) {
@@ -71,16 +74,15 @@ pipeline {
                 }
               }
               withEnv(envList) {
-                echo "Environment variables loaded"
+                echo "🌍 Environment variables loaded into Jenkins runtime"
               }
             } else {
-              echo '⚠️ No .env.example file found'
+              echo '⚠️ No .env.example found. Proceeding with defaults.'
             }
           }
         }
       }
     }
-
 
     stage('Generate BDD Tests (bddgen)') {
       steps {
@@ -93,122 +95,38 @@ pipeline {
     }
 
     // ---------- Priority Tests ----------
-    stage('Priority Tests - Google Chrome') {
-      steps {
-        script {
-          catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            bat 'npx playwright test --project="Google Chrome" --grep "@smoke|@positive" --reporter=list,html,allure-playwright'
+    def browsers = [
+      "Google Chrome",
+      "Microsoft Edge",
+      "Apple Safari",
+      "Mozilla Firefox",
+      "Samsung Internet (Android)",
+      "Opera / Brave (Chromium)"
+    ]
+
+    stages {
+      // Priority group
+      browsers.each { browser ->
+        stage("Priority Tests - ${browser}") {
+          steps {
+            script {
+              catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                bat "npx playwright test --project=\"${browser}\" --grep \"@smoke|@positive\" --reporter=list,html,allure-playwright"
+              }
+            }
           }
         }
       }
-    }
 
-    stage('Priority Tests - Microsoft Edge') {
-      steps {
-        script {
-          catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            bat 'npx playwright test --project="Microsoft Edge" --grep "@smoke|@positive" --reporter=list,html,allure-playwright'
-          }
-        }
-      }
-    }
-
-    stage('Priority Tests - Apple Safari') {
-      steps {
-        script {
-          catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            bat 'npx playwright test --project="Apple Safari" --grep "@smoke|@positive" --reporter=list,html,allure-playwright'
-          }
-        }
-      }
-    }
-
-    stage('Priority Tests - Mozilla Firefox') {
-      steps {
-        script {
-          catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            bat 'npx playwright test --project="Mozilla Firefox" --grep "@smoke|@positive" --reporter=list,html,allure-playwright'
-          }
-        }
-      }
-    }
-
-    stage('Priority Tests - Samsung Internet (Android)') {
-      steps {
-        script {
-          catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            bat 'npx playwright test --project="Samsung Internet (Android)" --grep "@smoke|@positive" --reporter=list,html,allure-playwright'
-          }
-        }
-      }
-    }
-
-    stage('Priority Tests - Opera / Brave (Chromium)') {
-      steps {
-        script {
-          catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            bat 'npx playwright test --project="Opera / Brave (Chromium)" --grep "@smoke|@positive" --reporter=list,html,allure-playwright'
-          }
-        }
-      }
-    }
-
-    // ---------- Remaining Tests ----------
-    stage('Remaining Tests - Google Chrome') {
-      steps {
-        script {
-          catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            bat 'npx playwright test --project="Google Chrome" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright'
-          }
-        }
-      }
-    }
-
-    stage('Remaining Tests - Microsoft Edge') {
-      steps {
-        script {
-          catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            bat 'npx playwright test --project="Microsoft Edge" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright'
-          }
-        }
-      }
-    }
-
-    stage('Remaining Tests - Apple Safari') {
-      steps {
-        script {
-          catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            bat 'npx playwright test --project="Apple Safari" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright'
-          }
-        }
-      }
-    }
-
-    stage('Remaining Tests - Mozilla Firefox') {
-      steps {
-        script {
-          catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            bat 'npx playwright test --project="Mozilla Firefox" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright'
-          }
-        }
-      }
-    }
-
-    stage('Remaining Tests - Samsung Internet (Android)') {
-      steps {
-        script {
-          catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            bat 'npx playwright test --project="Samsung Internet (Android)" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright'
-          }
-        }
-      }
-    }
-
-    stage('Remaining Tests - Opera / Brave (Chromium)') {
-      steps {
-        script {
-          catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            bat 'npx playwright test --project="Opera / Brave (Chromium)" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright'
+      // Remaining group
+      browsers.each { browser ->
+        stage("Remaining Tests - ${browser}") {
+          steps {
+            script {
+              catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                bat "npx playwright test --project=\"${browser}\" --grep-invert \"@smoke|@positive\" --reporter=list,html,allure-playwright"
+              }
+            }
           }
         }
       }
@@ -229,24 +147,30 @@ pipeline {
   post {
     always {
       script {
-        // If any stage failed, mark build as UNSTABLE
-        if (currentBuild.resultIsWorseOrEqualTo('FAILURE')) {
+        echo "📦 Archiving reports..."
+        archiveArtifacts artifacts: 'allure-report/**', allowEmptyArchive: true
+        archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
+        archiveArtifacts artifacts: 'test-results/**, traces/**, videos/**', allowEmptyArchive: true
+
+        // ✅ Mark build UNSTABLE if any stage failed
+        if (currentBuild.rawBuild.getActions(hudson.model.ErrorAction).size() > 0) {
           currentBuild.result = 'UNSTABLE'
+          echo '⚠️ Some stages failed — marking build as UNSTABLE.'
         }
       }
+    }
 
-      archiveArtifacts artifacts: 'allure-report/**', allowEmptyArchive: true
-      archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
-      archiveArtifacts artifacts: 'test-results/**, traces/**, videos/**', allowEmptyArchive: true
+    unstable {
+      echo '⚠️ Build completed with failed stages — check test reports for details.'
     }
     unstable {
       echo '⚠️ Build completed with some failed stages (UNSTABLE). Check test reports.'
     }
     failure {
-      echo '❌ Build failed! Check test reports and logs.'
+      echo '❌ Pipeline failed completely — investigate logs.'
     }
     success {
-      echo '✅ All tests passed successfully!'
+      echo '✅ All stages passed successfully!'
     }
   }
 }
