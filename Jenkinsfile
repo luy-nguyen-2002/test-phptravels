@@ -27,10 +27,15 @@ def runPlaywrightInvert(tags, project) {
 pipeline {
   agent any
 
-      environment{CI = "true" HEADLESS = "true"}
+  environment {
+    CI = "true"
+    HEADLESS = "true"
+  }
 
-  options{timeout(time : 90, unit
-                  : 'MINUTES') timestamps()}
+  options {
+    timeout(time: 90, unit: 'MINUTES')
+    timestamps()
+  }
 
   stages {
     stage('Checkout') {
