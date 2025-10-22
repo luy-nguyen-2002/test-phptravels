@@ -15,7 +15,7 @@ pipeline {
 
     stage('Checkout') {
       steps {
-        git branch: 'main', url: 'https://github.com/luy-nguyen-2002/ts-testerbud.git'
+        git branch: 'main', url: 'https://github.com/luy-nguyen-2002/test-phptravels.git'
       }
     }
 
