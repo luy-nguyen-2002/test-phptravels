@@ -38,8 +38,7 @@ pipeline {
         script {
           catchError(buildResult : 'SUCCESS', stageResult : 'FAILURE') {
             git branch : 'main',
-                         url
-                : 'https://github.com/luy-nguyen-2002/test-phptravels.git'
+            url: 'https://github.com/luy-nguyen-2002/test-phptravels.git'
           }
         }
       }
