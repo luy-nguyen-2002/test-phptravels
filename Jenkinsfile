@@ -25,9 +25,7 @@
 // ======================================================
 
 pipeline {
-  agent { 
-    label 'test-runner' 
-  }
+  agent any
 
   environment {
     BASE_URL= "https://phptravels.net/"
