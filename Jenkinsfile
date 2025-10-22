@@ -2,23 +2,23 @@
 // ---------- SHARED FUNCTIONS ----------
 // ======================================================
 
-def runPlaywright(tags, project) {
-  catchError(buildResult : 'SUCCESS', stageResult : 'FAILURE') {
-    bat """
-      echo Running Playwright tests for ${project} with tags: ${tags}
-      npx playwright test --project="${project}" --grep "${tags}" --reporter=list,html,allure-playwright
-    """
-  }
-}
+// def runPlaywright(tags, project) {
+//   catchError(buildResult : 'SUCCESS', stageResult : 'FAILURE') {
+//     bat """
+//       echo Running Playwright tests for ${project} with tags: ${tags}
+//       npx playwright test --project="${project}" --grep "${tags}" --reporter=list,html,allure-playwright
+//     """
+//   }
+// }
 
-def runPlaywrightInvert(tags, project) {
-  catchError(buildResult : 'SUCCESS', stageResult : 'FAILURE') {
-    bat """
-      echo Running remaining Playwright tests for ${project} (excluding ${tags})
-      npx playwright test --project="${project}" --grep-invert "${tags}" --reporter=list,html,allure-playwright
-    """
-  }
-}
+// def runPlaywrightInvert(tags, project) {
+//   catchError(buildResult : 'SUCCESS', stageResult : 'FAILURE') {
+//     bat """
+//       echo Running remaining Playwright tests for ${project} (excluding ${tags})
+//       npx playwright test --project="${project}" --grep-invert "${tags}" --reporter=list,html,allure-playwright
+//     """
+//   }
+// }
 
 // ======================================================
 // ---------- PIPELINE ----------
@@ -110,37 +110,72 @@ pipeline {
       }
     }
 
-    // ---------- PRIORITY TESTS ----------
+     // ---------- PRIORITY TESTS ----------
     stage('Priority Tests') {
       parallel {
         stage('Chrome') {
           steps {
-            script { runPlaywright('@smoke|@positive', 'Google Chrome') }
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+              bat '''
+                echo Running Playwright tests for Google Chrome
+                npx playwright test --project="Google Chrome" --grep "@smoke|@positive" --reporter=list,html,allure-playwright
+              '''
+            }
           }
         }
+
         stage('Edge') {
           steps {
-            script { runPlaywright('@smoke|@positive', 'Microsoft Edge') }
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+              bat '''
+                echo Running Playwright tests for Microsoft Edge
+                npx playwright test --project="Microsoft Edge" --grep "@smoke|@positive" --reporter=list,html,allure-playwright
+              '''
+            }
           }
         }
+
         stage('Safari') {
           steps {
-            script { runPlaywright('@smoke|@positive', 'Apple Safari') }
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+              bat '''
+                echo Running Playwright tests for Apple Safari
+                npx playwright test --project="Apple Safari" --grep "@smoke|@positive" --reporter=list,html,allure-playwright
+              '''
+            }
           }
         }
+
         stage('Firefox') {
           steps {
-            script { runPlaywright('@smoke|@positive', 'Mozilla Firefox') }
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+              bat '''
+                echo Running Playwright tests for Mozilla Firefox
+                npx playwright test --project="Mozilla Firefox" --grep "@smoke|@positive" --reporter=list,html,allure-playwright
+              '''
+            }
           }
         }
+
         stage('Samsung Internet') {
           steps {
-            script { runPlaywright('@smoke|@positive', 'Samsung Internet (Android)') }
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+              bat '''
+                echo Running Playwright tests for Samsung Internet (Android)
+                npx playwright test --project="Samsung Internet (Android)" --grep "@smoke|@positive" --reporter=list,html,allure-playwright
+              '''
+            }
           }
         }
+
         stage('Opera / Brave') {
           steps {
-            script { runPlaywright('@smoke|@positive', 'Opera / Brave (Chromium)') }
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+              bat '''
+                echo Running Playwright tests for Opera / Brave (Chromium)
+                npx playwright test --project="Opera / Brave (Chromium)" --grep "@smoke|@positive" --reporter=list,html,allure-playwright
+              '''
+            }
           }
         }
       }
@@ -151,32 +186,67 @@ pipeline {
       parallel {
         stage('Chrome') {
           steps {
-            script { runPlaywrightInvert('@smoke|@positive', 'Google Chrome') }
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+              bat '''
+                echo Running remaining Playwright tests for Google Chrome
+                npx playwright test --project="Google Chrome" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright
+              '''
+            }
           }
         }
+
         stage('Edge') {
           steps {
-            script { runPlaywrightInvert('@smoke|@positive', 'Microsoft Edge') }
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+              bat '''
+                echo Running remaining Playwright tests for Microsoft Edge
+                npx playwright test --project="Microsoft Edge" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright
+              '''
+            }
           }
         }
+
         stage('Safari') {
           steps {
-            script { runPlaywrightInvert('@smoke|@positive', 'Apple Safari') }
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+              bat '''
+                echo Running remaining Playwright tests for Apple Safari
+                npx playwright test --project="Apple Safari" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright
+              '''
+            }
           }
         }
+
         stage('Firefox') {
           steps {
-            script { runPlaywrightInvert('@smoke|@positive', 'Mozilla Firefox') }
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+              bat '''
+                echo Running remaining Playwright tests for Mozilla Firefox
+                npx playwright test --project="Mozilla Firefox" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright
+              '''
+            }
           }
         }
+
         stage('Samsung Internet') {
           steps {
-            script { runPlaywrightInvert('@smoke|@positive', 'Samsung Internet (Android)') }
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+              bat '''
+                echo Running remaining Playwright tests for Samsung Internet (Android)
+                npx playwright test --project="Samsung Internet (Android)" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright
+              '''
+            }
           }
         }
+
         stage('Opera / Brave') {
           steps {
-            script { runPlaywrightInvert('@smoke|@positive', 'Opera / Brave (Chromium)') }
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+              bat '''
+                echo Running remaining Playwright tests for Opera / Brave (Chromium)
+                npx playwright test --project="Opera / Brave (Chromium)" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright
+              '''
+            }
           }
         }
       }
