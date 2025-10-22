@@ -28,6 +28,7 @@ pipeline {
   agent any
 
   environment {
+    BASE_URL=https://phptravels.net/
     CI = "true"
     HEADLESS = "true"
   }
@@ -75,32 +76,32 @@ pipeline {
       }
     }
 
-    stage('Load .env.example') {
-      steps {
-        script {
-          catchError(buildResult : 'SUCCESS', stageResult : 'FAILURE') {
-            if (fileExists('.env.example')) {
-              echo 'Loading environment variables from .env.example'
-              def envLines = readFile('.env.example').split('\n')
-              def envList = []
+    // stage('Load .env.example') {
+    //   steps {
+    //     script {
+    //       catchError(buildResult : 'SUCCESS', stageResult : 'FAILURE') {
+    //         if (fileExists('.env.example')) {
+    //           echo 'Loading environment variables from .env.example'
+    //           def envLines = readFile('.env.example').split('\n')
+    //           def envList = []
 
-              for (line in envLines) {
-                if (!line.trim().startsWith('#') && line.contains('=')) {
-                  def (key, value) = line.split('=', 2)
-                  envList << "${key.trim()}=${value.trim().replaceAll('\"', '')}"
-                }
-              }
+    //           for (line in envLines) {
+    //             if (!line.trim().startsWith('#') && line.contains('=')) {
+    //               def (key, value) = line.split('=', 2)
+    //               envList << "${key.trim()}=${value.trim().replaceAll('\"', '')}"
+    //             }
+    //           }
 
-              withEnv(envList) {
-                echo '✅ Environment variables loaded.'
-              }
-            } else {
-              echo '⚠️ No .env.example found. Proceeding with defaults.'
-            }
-          }
-        }
-      }
-    }
+    //           withEnv(envList) {
+    //             echo '✅ Environment variables loaded.'
+    //           }
+    //         } else {
+    //           echo '⚠️ No .env.example found. Proceeding with defaults.'
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
 
     stage('Generate BDD Tests (bddgen)') {
       steps {
