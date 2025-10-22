@@ -174,21 +174,17 @@ pipeline {
     }
 
     //allure report
-    stage('Generate Allure HTML Report') {
-      steps {
-          script {
-              catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                  echo "📄 Generating Allure HTML Report"
-                  // Use PowerShell to handle paths with spaces
-                  powershell '''
-                  $allureResults = "C:\\Users\\Nguyen A Luy\\.jenkins\\workspace\\ts-phptravels-multibranch_main\\allure-results"
-                  $allureReport = "C:\\Users\\Nguyen A Luy\\.jenkins\\workspace\\ts-phptravels-multibranch_main\\allure-report"
-                  npx allure generate $allureResults --clean -o $allureReport
-                  '''
-              }
-          }
-      }
-    }
+    // stage('Generate Allure HTML Report') {
+    //   steps {
+    //       script {
+    //           catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+    //               echo "📄 Generating Allure HTML Report"
+    //               bat 'npx allure generate ./allure-results --clean -o allure-report'
+    //           }
+    //       }
+    //   }
+    // }
+
   }
 
   post {
@@ -200,7 +196,7 @@ pipeline {
         }
       }
 
-      archiveArtifacts artifacts: 'allure-report/**', allowEmptyArchive: true
+      // archiveArtifacts artifacts: 'allure-report/**', allowEmptyArchive: true
       archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
       archiveArtifacts artifacts: 'test-results/**, traces/**, videos/**', allowEmptyArchive: true
     }
