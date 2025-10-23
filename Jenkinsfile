@@ -154,20 +154,20 @@ pipeline {
     // -----------------------------------------------
     // Merge Allure results into a single folder
     // -----------------------------------------------
-    stage('Prepare Allure Results') {
-      steps {
-        script {
-          echo "📂 Merging all Playwright results into one folder"
-          bat '''
-            if exist allure-results-all rmdir /s /q allure-results-all
-            mkdir allure-results-all
-            for /d %%d in (allure-results\\*) do (
-                xcopy "%%d\\*.json" allure-results-all /s /y
-            )
-          '''
-        }
-      }
-    }
+    // stage('Prepare Allure Results') {
+    //   steps {
+    //     script {
+    //       echo "📂 Merging all Playwright results into one folder"
+    //       bat '''
+    //         if exist allure-results-all rmdir /s /q allure-results-all
+    //         mkdir allure-results-all
+    //         for /d %%d in (allure-results\\*) do (
+    //             xcopy "%%d\\*.json" allure-results-all /s /y
+    //         )
+    //       '''
+    //     }
+    //   }
+    // }
 
     //allure report
     stage('Generate Allure HTML Report') {
@@ -176,7 +176,7 @@ pipeline {
               catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                   echo "📄 Generating Allure HTML Report (Windows-safe)"
                   // Generate the report
-                  bat 'npx allure generate ./allure-results-all --clean -o allure-report'
+                  bat 'npx allure generate allure-results\\* --clean -o allure-report'
               }
           }
       }
@@ -193,7 +193,7 @@ pipeline {
         }
       }
 
-      archiveArtifacts artifacts: 'allure-results-all/**', allowEmptyArchive: true
+      archiveArtifacts artifacts: 'allure-results/**', allowEmptyArchive: true
       archiveArtifacts artifacts: 'allure-report/**', allowEmptyArchive: true
       archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
       archiveArtifacts artifacts: 'test-results/**, traces/**, videos/**', allowEmptyArchive: true
