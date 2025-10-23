@@ -108,7 +108,7 @@ pipeline {
             'Apple Safari',
             'Mozilla Firefox',
             'Samsung Internet (Android)',
-            'Opera / Brave (Chromium)'
+            'Opera Brave (Chromium)'
           ]
 
           def parallelStages = browsers.collectEntries { browser ->
@@ -139,7 +139,7 @@ pipeline {
             'Apple Safari',
             'Mozilla Firefox',
             'Samsung Internet (Android)',
-            'Opera / Brave (Chromium)'
+            'Opera Brave (Chromium)'
           ]
 
           def parallelStages = browsers.collectEntries { browser ->
