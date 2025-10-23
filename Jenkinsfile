@@ -160,7 +160,7 @@ pipeline {
         echo "📄 Generating Allure HTML report from all browser results"
         catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
           // Generate report from multiple directories (one per browser)
-          bat 'npx allure generate "allure-results\\*" --clean -o allure-report'
+          bat 'npx allure generate "allure-results" --clean -o allure-report'
         }
 
         if (currentBuild.resultIsWorseOrEqualTo('FAILURE')) {
@@ -170,7 +170,6 @@ pipeline {
       }
 
       archiveArtifacts artifacts: 'allure-report/**', allowEmptyArchive: true
-      archiveArtifacts artifacts: 'allure-results/**', allowEmptyArchive: true
       archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
       archiveArtifacts artifacts: 'test-results/**, traces/**, videos/**', allowEmptyArchive: true
     }
