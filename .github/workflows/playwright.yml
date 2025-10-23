@@ -34,7 +34,7 @@ jobs:
             grep: "@smoke|@positive"
           - browser: "Samsung Internet (Android)"
             grep: "@smoke|@positive"
-          - browser: "Opera / Brave (Chromium)"
+          - browser: "Opera Brave (Chromium)"
             grep: "@smoke|@positive"
 
     steps:
