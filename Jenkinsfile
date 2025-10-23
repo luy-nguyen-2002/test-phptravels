@@ -179,11 +179,8 @@ pipeline {
           script {
               catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                   echo "📄 Generating Allure HTML Report (Windows-safe)"
-                  // Merge all JSON results into a single folder
-                  bat 'npx allure merge ./allure-results --output ./allure-merged-results'
-
-                  // Generate the final Allure report from the merged results
-                  bat 'npx allure generate ./allure-merged-results --clean -o allure-report'
+                  // Generate the report
+                  bat 'npx allure generate ./allure-results --clean -o allure-report'
               }
           }
       }
