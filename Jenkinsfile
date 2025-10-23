@@ -179,22 +179,11 @@ pipeline {
           script {
               catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                   echo "📄 Generating Allure HTML Report (Windows-safe)"
+                  // Merge all JSON results into a single folder
+                  bat 'npx allure merge ./allure-results --output ./allure-merged-results'
 
-                  // Wait a few seconds to ensure all JSON files are flushed
-                  bat 'timeout /t 5'
-
-                  // Remove empty JSON files (Allure fails on empty files)
-                  bat '''
-                  for %%f in (allure-results\\*.json) do (
-                      if %%~zf==0 (
-                          echo ⚠️ Deleting empty Allure result file: %%f
-                          del "%%f"
-                      )
-                  )
-                  '''
-
-                  // Generate the Allure report
-                  bat 'npx allure generate ./allure-results --clean -o allure-report'
+                  // Generate the final Allure report from the merged results
+                  bat 'npx allure generate ./allure-merged-results --clean -o allure-report'
               }
           }
       }
