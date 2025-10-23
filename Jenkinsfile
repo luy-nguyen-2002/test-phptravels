@@ -159,8 +159,8 @@ pipeline {
         
         echo "📄 Generating Allure HTML report from all browser results"
         catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-          // Generate Allure report from multiple directories
-          bat 'npx allure generate ./allure-results --clean -o allure-report'
+          // Generate report from multiple directories (one per browser)
+          bat 'npx allure generate "allure-results\\*" --clean -o allure-report'
         }
 
         if (currentBuild.resultIsWorseOrEqualTo('FAILURE')) {
