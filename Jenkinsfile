@@ -1,26 +1,4 @@
 // ======================================================
-// ---------- SHARED FUNCTIONS ----------
-// ======================================================
-
-// def runPlaywright(tags, project) {
-//   catchError(buildResult : 'SUCCESS', stageResult : 'FAILURE') {
-//     bat """
-//       echo Running Playwright tests for ${project} with tags: ${tags}
-//       npx playwright test --project="${project}" --grep "${tags}" --reporter=list,html,allure-playwright
-//     """
-//   }
-// }
-
-// def runPlaywrightInvert(tags, project) {
-//   catchError(buildResult : 'SUCCESS', stageResult : 'FAILURE') {
-//     bat """
-//       echo Running remaining Playwright tests for ${project} (excluding ${tags})
-//       npx playwright test --project="${project}" --grep-invert "${tags}" --reporter=list,html,allure-playwright
-//     """
-//   }
-// }
-
-// ======================================================
 // ---------- PIPELINE ----------
 // ======================================================
 
@@ -215,6 +193,7 @@ pipeline {
         }
       }
 
+      archiveArtifacts artifacts: 'allure-results-all/**', allowEmptyArchive: true
       archiveArtifacts artifacts: 'allure-report/**', allowEmptyArchive: true
       archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
       archiveArtifacts artifacts: 'test-results/**, traces/**, videos/**', allowEmptyArchive: true
