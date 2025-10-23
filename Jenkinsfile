@@ -31,9 +31,10 @@ pipeline {
     stage('Setup Node.js') {
       steps {
         script {
-          catchError(buildResult : 'UNSTABLE', stageResult : 'FAILURE') {
-            bat 'node -v || echo Node not installed' bat 'npm -v || echo npm not installed'
-          }
+            catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                bat 'node -v || echo Node not installed'
+                bat 'npm -v || echo npm not installed'
+            }
         }
       }
     }
