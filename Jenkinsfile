@@ -131,7 +131,7 @@ pipeline {
               catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                 bat """
                   echo Running Playwright Priority tests for ${browser}
-                  npx playwright test --project="${browser}" --grep "@smoke|@positive" --reporter=list,html,allure-playwright
+                  npx playwright test --project="${browser}" --grep "@smoke|@positive" --reporter=list,html,allure-playwright --output=allure-results\\${browser.replace(' ', '_')}
                 """
               }
             }]
@@ -162,13 +162,31 @@ pipeline {
               catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                 bat """
                   echo Running Remaining Playwright tests for ${browser}
-                  npx playwright test --project="${browser}" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright
+                  npx playwright test --project="${browser}" --grep-invert "@smoke|@positive" --reporter=list,html,allure-playwright --output=allure-results\\${browser.replace(' ', '_')}
                 """
               }
             }]
           }
 
           parallel parallelStages
+        }
+      }
+    }
+
+    // -----------------------------------------------
+    // Merge Allure results into a single folder
+    // -----------------------------------------------
+    stage('Prepare Allure Results') {
+      steps {
+        script {
+          echo "📂 Merging all Playwright results into one folder"
+          bat '''
+            if exist allure-results-all rmdir /s /q allure-results-all
+            mkdir allure-results-all
+            for /d %%d in (allure-results\\*) do (
+                xcopy "%%d\\*.json" allure-results-all /s /y
+            )
+          '''
         }
       }
     }
