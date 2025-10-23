@@ -41,7 +41,7 @@ export default class FooterComponent extends Base {
         this.footerFileClaimLink = this.page.getByRole('link', { name: 'file a claim' });
         this.footerContactUsLink = this.page.getByRole('link', { name: 'contact us', exact: true });
         this.footerBecomeSupplierLink = this.page.getByRole('link', { name: 'become a supplier' });
-        this.footerCareersAndJobsLink = this.page.getByRole('link', { name: 'careers & jobs' });
+        this.footerCareersAndJobsLink = this.page.getByRole('link', { name: 'careers and jobs' });
         this.footerTermsOfUseLink = this.page.getByRole('link', { name: 'terms of use' });
         this.footerFaqLink = this.page.getByRole('link', { name: 'faq' });
         this.footerHowToBookLink = this.page.getByRole('link', { name: 'how to book' });
@@ -58,66 +58,36 @@ export default class FooterComponent extends Base {
     }
 
     // --- 🧭 GETTERS ---
-    get banner() { return this.footerBanner; }
-    get playStore() { return this.playStoreButton; }
-    get appleStore() { return this.appleStoreButton; }
-    get bannerContent() { return this.footerBannerContent; }
+    getBanner(): Locator { return this.footerBanner; }
+    getPlayStore(): Locator { return this.playStoreButton; }
+    getAppleStore(): Locator { return this.appleStoreButton; }
+    getBannerContent(): Locator { return this.footerBannerContent; }
 
     // Links
-    get aboutUs() { return this.footerAboutUsLink; }
-    get privacyPolicy() { return this.footerPrivacyPolicyLink; }
-    get fileClaim() { return this.footerFileClaimLink; }
-    get contactUs() { return this.footerContactUsLink; }
-    get becomeSupplier() { return this.footerBecomeSupplierLink; }
-    get careersAndJobs() { return this.footerCareersAndJobsLink; }
-    get termsOfUse() { return this.footerTermsOfUseLink; }
-    get faq() { return this.footerFaqLink; }
-    get howToBook() { return this.footerHowToBookLink; }
-    get cookiesPolicy() { return this.footerCookiesPolicyLink; }
-    get bookingTips() { return this.footerBookingTipsLink; }
+    getAboutUs(): Locator { return this.footerAboutUsLink; }
+    getPrivacyPolicy(): Locator { return this.footerPrivacyPolicyLink; }
+    getFileClaim(): Locator { return this.footerFileClaimLink; }
+    getContactUs(): Locator { return this.footerContactUsLink; }
+    getBecomeSupplier(): Locator { return this.footerBecomeSupplierLink; }
+    getCareersAndJobs(): Locator { return this.footerCareersAndJobsLink; }
+    getTermsOfUse(): Locator { return this.footerTermsOfUseLink; }
+    getFaq(): Locator { return this.footerFaqLink; }
+    getHowToBook(): Locator { return this.footerHowToBookLink; }
+    getCookiesPolicy(): Locator { return this.footerCookiesPolicyLink; }
+    getBookingTips(): Locator { return this.footerBookingTipsLink; }
 
     // Newsletter
-    get newsletterLogo() { return this.footerNewsletterLogo; }
-    get newsletterPhone() { return this.footerNewsletterPhoneNumber; }
-    get newsletterEmailLink() { return this.footerNewsleetterEmailLink; }
-    get newsletterContactLink() { return this.footerNewsletterContactLink; }
-    get newsletterNameInput() { return this.footerNewsletterNameInput; }
-    get newsletterEmailInput() { return this.footerNewsletterEmailInput; }
-    get newsletterSignupButton() { return this.footerNewsletterSignupButton; }
+    getNewsletterLogo(): Locator { return this.footerNewsletterLogo; }
+    getNewsletterPhone(): Locator { return this.footerNewsletterPhoneNumber; }
+    getNewsletterEmailLink(): Locator { return this.footerNewsleetterEmailLink; }
+    getNewsletterContactLink(): Locator { return this.footerNewsletterContactLink; }
+    getNewsletterNameInput(): Locator { return this.footerNewsletterNameInput; }
+    getNewsletterEmailInput(): Locator { return this.footerNewsletterEmailInput; }
+    getNewsletterSignupButton(): Locator { return this.footerNewsletterSignupButton; }
 
-    // --- 🖱️ CLICK METHODS ---
-    async clickPlayStore() { await this.playStore.click(); }
-    async clickAppleStore() { await this.appleStore.click(); }
-
-    async clickAboutUs() { await this.aboutUs.click(); }
-    async clickPrivacyPolicy() { await this.privacyPolicy.click(); }
-    async clickFileClaim() { await this.fileClaim.click(); }
-    async clickContactUs() { await this.contactUs.click(); }
-    async clickBecomeSupplier() { await this.becomeSupplier.click(); }
-    async clickCareersAndJobs() { await this.careersAndJobs.click(); }
-    async clickTermsOfUse() { await this.termsOfUse.click(); }
-    async clickFaq() { await this.faq.click(); }
-    async clickHowToBook() { await this.howToBook.click(); }
-    async clickCookiesPolicy() { await this.cookiesPolicy.click(); }
-    async clickBookingTips() { await this.bookingTips.click(); }
-
-    async clickNewsletterLogo() { await this.newsletterLogo.click(); }
-    async clickNewsletterEmailLink() { await this.newsletterEmailLink.click(); }
-    async clickNewsletterContactLink() { await this.newsletterContactLink.click(); }
-    async clickNewsletterSignup() { await this.newsletterSignupButton.click(); }
-
-    // --- ⌨️ ENTER METHODS ---
-    async enterNewsletterName(name: string) {
-        await this.newsletterNameInput.fill(name);
-    }
-
-    async enterNewsletterEmail(email: string) {
-        await this.newsletterEmailInput.fill(email);
-    }
-
-    async subscribeToNewsletter(name: string, email: string) {
-        await this.enterNewsletterName(name);
-        await this.enterNewsletterEmail(email);
-        await this.clickNewsletterSignup();
+    // --- 🧭 UTIL ---
+    async scrollToFooter() {
+        await this.page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+        await this.page.waitForTimeout(500);
     }
 }
