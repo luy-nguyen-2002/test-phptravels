@@ -82,6 +82,12 @@ pipeline {
     //   }
     // }
 
+    stage('Clean Allure Results') {
+      steps {
+        bat 'rmdir /s /q allure-results || echo "No previous results"'
+      }
+    }
+
     stage('Generate BDD Tests (bddgen)') {
       steps {
         catchError(buildResult : 'UNSTABLE', stageResult : 'FAILURE') {
