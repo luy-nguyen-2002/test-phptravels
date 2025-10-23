@@ -21,7 +21,7 @@ jobs:
           "Apple Safari",
           "Mozilla Firefox",
           "Samsung Internet (Android)",
-          "Opera / Brave (Chromium)"
+          "Opera Brave (Chromium)"
         ]
         include:
           - browser: "Google Chrome"
