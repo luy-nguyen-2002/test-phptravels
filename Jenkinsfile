@@ -198,7 +198,7 @@ pipeline {
               catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                   echo "📄 Generating Allure HTML Report (Windows-safe)"
                   // Generate the report
-                  bat 'npx allure generate ./allure-results --clean -o allure-report'
+                  bat 'npx allure generate ./allure-results-all --clean -o allure-report'
               }
           }
       }
