@@ -181,7 +181,7 @@ pipeline {
                   echo "📄 Generating Allure HTML Report (Windows-safe)"
 
                   // Wait a few seconds to ensure all JSON files are flushed
-                  bat 'timeout /t 5 >nul'
+                  bat 'timeout /t 5'
 
                   // Remove empty JSON files (Allure fails on empty files)
                   bat '''
