@@ -113,7 +113,7 @@ export default defineConfig({
     // Note: Playwright doesn’t have native Opera or Brave channels,
     // but Chrome channel simulates them closely.
     {
-      name: 'Opera / Brave (Chromium)',
+      name: 'Opera Brave (Chromium)',
       use: {
         ...devices['Desktop Chrome'],
         locale: 'en-US',
