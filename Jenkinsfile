@@ -178,7 +178,22 @@ pipeline {
       steps {
           script {
               catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                  echo "📄 Generating Allure HTML Report"
+                  echo "📄 Generating Allure HTML Report (Windows-safe)"
+
+                  // Wait a few seconds to ensure all JSON files are flushed
+                  bat 'timeout /t 5 >nul'
+
+                  // Remove empty JSON files (Allure fails on empty files)
+                  bat '''
+                  for %%f in (allure-results\\*.json) do (
+                      if %%~zf==0 (
+                          echo ⚠️ Deleting empty Allure result file: %%f
+                          del "%%f"
+                      )
+                  )
+                  '''
+
+                  // Generate the Allure report
                   bat 'npx allure generate ./allure-results --clean -o allure-report'
               }
           }
@@ -196,7 +211,7 @@ pipeline {
         }
       }
 
-      // archiveArtifacts artifacts: 'allure-report/**', allowEmptyArchive: true
+      archiveArtifacts artifacts: 'allure-report/**', allowEmptyArchive: true
       archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
       archiveArtifacts artifacts: 'test-results/**, traces/**, videos/**', allowEmptyArchive: true
     }
